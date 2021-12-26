@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Control API</title>
+    <script src="https://unpkg.com/swagger-ui-dist@3/swagger-ui-bundle.js" charset="UTF-8"></script>
+    <link rel="stylesheet" type="text/css" href="https://unpkg.com/swagger-ui-dist@3/swagger-ui.css">
+</head>
+<body>
+<div id="swagger-ui"></div>
+<script>
+    window.onload = function() {
+
+        // Build a system
+        const ui = SwaggerUIBundle({
+            url: "https://api.swaggerhub.com/apis/Sympower/Sympower-Control-API/2.1.0",
+            dom_id: '#swagger-ui',
+            defaultModelsExpandDepth: -1,
+            deepLinking: true,
+            presets: [
+                SwaggerUIBundle.presets.apis,
+                SwaggerUIBundle.SwaggerUIStandalonePreset
+            ],
+            plugins: [
+                SwaggerUIBundle.plugins.DownloadUrl
+            ],
+            requestInterceptor: (request) => {
+                console.log(request)
+                request.url = request.url.replace("http://control-api.sympower.net/sympower/v2/", "/")
+                return request
+            }
+        })
+
+        window.ui = ui
+    }
+</script>
+</body>
+</html>

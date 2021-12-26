@@ -1,0 +1,15 @@
+{
+  "apiPackage": "net.sympower.control.api",
+  "groupId": "net.sympower.control",
+  "packageName": "net.sympower.control.api.server",
+  "modelPackage": "net.sympower.control.api.server.models",
+  "dateLibrary": "java8",
+  "library": "ktor",
+  "useBeanValidation": true,
+  "interfaceOnly": true,
+  "modelMutable": true,
+  "hideGenerationTimestamp": true,
+  "serviceInterface": true,
+  "openApiNullable": false,
+  "featureLocations": false
+}

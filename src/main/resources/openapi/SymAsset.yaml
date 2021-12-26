@@ -1,0 +1,177 @@
+openapi: 3.0.3
+info:
+  title: SYMASSET
+  description: Simulation of assets with power meters for the Sympower control and metering API.
+  version: 1.0.0
+
+paths:
+  /asset:
+    get:
+      summary: Get all wires
+      responses:
+        "200":
+          description: Array of simulated wires
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Asset'
+  /asset/{assetId}/settings:
+      put:
+        summary: Update asset settings
+        parameters:
+          - name: assetId
+            in: path
+            description: id of the asset
+            required: true
+            schema:
+              type: number
+        responses:
+          "200":
+            description: Returns the updated asset
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Asset'
+        requestBody:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AssetSettings'
+  /asset/{assetId}/wire_error:
+    put:
+      summary: Update wire error
+      parameters:
+        - name: assetId
+          in: path
+          description: id of the asset
+          required: true
+          schema:
+            type: number
+      responses:
+        "200":
+          description: Returns the updated asset
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Asset'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Error"
+    delete:
+      summary: Clear a wire error
+      parameters:
+        - name: assetId
+          in: path
+          description: id of the asset
+          required: true
+          schema:
+            type: number
+      responses:
+        "200":
+          description: Returns the updated asset
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Asset'
+  /asset/{assetId}/meter_error:
+    put:
+      summary: Update meter error
+      parameters:
+        - name: assetId
+          in: path
+          description: id of the asset
+          required: true
+          schema:
+            type: number
+      responses:
+        "200":
+          description: Returns the updated asset
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Asset'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Error"
+    delete:
+      summary: Clear a meter error
+      parameters:
+        - name: assetId
+          in: path
+          description: id of the asset
+          required: true
+          schema:
+            type: number
+      responses:
+        "200":
+          description: Returns the updated asset
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Asset'
+  /asset/addAnalogWire:
+      post:
+        summary: Add another analog wire with power meter and default settings.
+        responses:
+          "200":
+            description: Returns the added asset
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Asset'
+  /asset/addRelayWire:
+    post:
+      summary: Add another relay wire with power meter and default settings.
+      responses:
+        "200":
+          description: Returns the added asset
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Asset'
+components:
+  schemas:
+    Asset:
+      type: object
+      properties:
+        resource:
+          $ref: "https://api.swaggerhub.com/apis/Sympower/Sympower-Control-API/2.1.0#/definitions/Resource"
+        meter:
+          $ref: "https://api.swaggerhub.com/apis/Sympower/Sympower-Metering-API/2.0.1#/definitions/Meter"
+        settings:
+          $ref: '#/components/schemas/AssetSettings'
+    AssetSettings:
+      type: object
+      properties:
+        minPower:
+          type: integer
+          example: 0
+          description: min.power consumption in watts
+        maxPower:
+          type: integer
+          example: 1000000
+          description: max. power consumption in watts
+        maxDeviation:
+          type: integer
+          example: 10000
+          description: max. deviation from expected power consumption in watts
+        rampRate:
+          type: integer
+          example: 51
+          description: Ramp rate in %.
+    Error:
+      type: object
+      properties:
+        code:
+          type: string
+          enum:
+            - unknown
+            - unavailable
+        message:
+          type: string
