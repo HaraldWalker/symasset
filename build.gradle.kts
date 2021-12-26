@@ -72,6 +72,10 @@ tasks.named("compileKotlin") {
     dependsOn ("Generate-Sympower-Control-API-Server", "Generate-Sympower-Metering-API-Server")
 }
 
+tasks.create("stage") {
+    dependsOn("installDist")
+}
+
 kotlin {
     sourceSets {
        main {
