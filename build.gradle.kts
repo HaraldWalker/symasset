@@ -1,5 +1,3 @@
-import org.jetbrains.kotlin.ir.backend.js.compile
-
 val ktor_version: String by project
 val kotlin_version: String by project
 val logback_version: String by project
@@ -9,13 +7,13 @@ plugins {
     kotlin("jvm") version "1.6.10"
     id("org.openapi.generator") version "5.3.0"
     id("de.undercouch.download") version "4.1.2"
+    id ("com.heroku.sdk.heroku-gradle") version "2.0.0"
 }
 
 group = "eu.bitwalker"
 version = "0.0.1"
 application {
     mainClass.set("eu.bitwalker.symasset.ApplicationKt")
-    applicationDefaultJvmArgs = listOf("-Dio.ktor.development=true")
 }
 
 repositories {
