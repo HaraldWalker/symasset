@@ -11,10 +11,10 @@
  */
 package eu.bitwalker.symasset.web
 
-import com.google.gson.Gson
 import eu.bitwalker.symasset.service.AssetService
+import eu.bitwalker.symasset.service.MeteringService
+import eu.bitwalker.symasset.service.ResourceGroupService
 import io.ktor.application.*
-import io.ktor.http.*
 import io.ktor.request.*
 import io.ktor.response.*
 import io.ktor.routing.*
@@ -23,9 +23,7 @@ import net.sympower.control.api.server.models.ResourceLevelChangeResponse
 import net.sympower.control.api.server.models.TimestampedIntegerValue
 import java.time.OffsetDateTime
 
-fun Route.mockControlApi(assetService: AssetService) {
-    val gson = Gson()
-    val empty = mutableMapOf<String, Any?>()
+fun Route.mockControlApi(assetService: AssetService, resourceGroupService: ResourceGroupService, meteringService: MeteringService) {
 
     route("/control/bulk/resources/targetLevelChanges") {
         post {
@@ -35,6 +33,7 @@ fun Route.mockControlApi(assetService: AssetService) {
                 val changeResponse =
                     changeTargetLevelOfAsset(
                         assetService,
+                        meteringService,
                         changeRequest.resourceAddress.groupNumber,
                         changeRequest.resourceAddress.number,
                         changeRequest.targetLevel
@@ -58,51 +57,14 @@ fun Route.mockControlApi(assetService: AssetService) {
     route("/control/resourceGroups/{resourceGroupNumber}") {
         get {
             val resourceGroupNumber = call.parameters["resourceGroupNumber"]?.toInt()
-            val resources = assetService.getResourceByResourceGroupNumber(resourceGroupNumber)
+            val resources = resourceGroupService.getByNumber(resourceGroupNumber)
             call.respond(resources)
         }
     }
 
     route("/control/resourceGroups") {
         get {
-            val exampleContentType = "application/json"
-            val exampleContentString = """{
-              "number" : 1,
-              "name" : "Engine room 42",
-              "resources" : [ {
-                "address" : {
-                  "number" : 1,
-                  "groupNumber" : 1
-                },
-                "currentControllablePowerConsumption" : "{}",
-                "level" : "{}",
-                "isOutOfOperation" : true,
-                "name" : "Engine 42-1",
-                "maxControllablePowerConsumption" : 100000,
-                "type" : "relay",
-                "error" : "{}",
-                "targetLevel" : "{}"
-              }, {
-                "address" : {
-                  "number" : 1,
-                  "groupNumber" : 1
-                },
-                "currentControllablePowerConsumption" : "{}",
-                "level" : "{}",
-                "isOutOfOperation" : true,
-                "name" : "Engine 42-1",
-                "maxControllablePowerConsumption" : 100000,
-                "type" : "relay",
-                "error" : "{}",
-                "targetLevel" : "{}"
-              } ]
-            }"""
-
-            when (exampleContentType) {
-                "application/json" -> call.respond(gson.fromJson(exampleContentString, empty::class.java))
-                "application/xml" -> call.respondText(exampleContentString, ContentType.Text.Xml)
-                else -> call.respondText(exampleContentString)
-            }
+            call.respond(resourceGroupService.getAll())
         }
     }
 
@@ -113,7 +75,7 @@ fun Route.mockControlApi(assetService: AssetService) {
             val formParameters = call.receiveParameters()
             val targetLevel = formParameters["targetLevel"]!!.toInt()
             val changeResponse =
-                changeTargetLevelOfAsset(assetService, resourceGroupNumber, resourceNumber, targetLevel)
+                changeTargetLevelOfAsset(assetService, meteringService, resourceGroupNumber, resourceNumber, targetLevel)
             call.respond(changeResponse)
         }
     }
@@ -122,6 +84,7 @@ fun Route.mockControlApi(assetService: AssetService) {
 
 private fun changeTargetLevelOfAsset(
     assetService: AssetService,
+    meteringService: MeteringService,
     resourceGroupNumber: Int,
     resourceNumber: Int,
     newTargetLevel: Int
@@ -129,7 +92,7 @@ private fun changeTargetLevelOfAsset(
     val asset = assetService.getAssetByResourceGroupNumberAndWireNumber(resourceGroupNumber, resourceNumber)
     val now = OffsetDateTime.now()
     if (asset.resource.targetLevel.value != newTargetLevel) {
-        assetService.simulateMeter(asset) // to get a latest power meter value
+        meteringService.simulateMeter(asset) // to get a latest power meter value
         asset.status.previousLevel = asset.resource.targetLevel.value
         asset.status.targetLevelChangedAt = now
         asset.resource.targetLevel = TimestampedIntegerValue(newTargetLevel, now)

@@ -5,23 +5,24 @@ import eu.bitwalker.symasset.model.Settings
 import eu.bitwalker.symasset.model.Status
 import net.sympower.control.api.server.models.Resource
 import net.sympower.control.api.server.models.ResourceAddress
+import net.sympower.control.api.server.models.ResourceGroup
 import net.sympower.control.api.server.models.TimestampedIntegerValue
 import net.sympower.metering.api.server.models.ActivePower
 import net.sympower.metering.api.server.models.DeviceError
 import net.sympower.metering.api.server.models.Meter
 import java.time.OffsetDateTime
-import java.time.temporal.ChronoUnit
-import kotlin.random.Random
 
-class AssetService {
+class AssetService(private val resourceGroupService: ResourceGroupService, private val meteringService: MeteringService) {
 
     private val assets = mutableListOf<Asset>()
 
     fun initializeAnalogWires(amount: Int) {
+        resourceGroupService.addResourceGroup(ResourceGroup(1, "Analog group", emptyList()))
         repeat(amount) { addAnalogWire() }
     }
 
     fun initializeRelayWires(amount: Int) {
+        resourceGroupService.addResourceGroup(ResourceGroup(2, "Relay group", emptyList()))
         repeat(amount) { addRelayWire() }
     }
 
@@ -61,15 +62,12 @@ class AssetService {
         )
         val wire = Asset(resource, meter, Settings(0, 10000000, 10000, 51), Status(0, now))
         assets.add(wire)
+        resourceGroupService.addResource(wire.resource)
         return wire
     }
 
     fun getWires(): MutableList<Asset> {
         return assets
-    }
-
-    fun getAssetById(id: Int): Asset {
-        return assets[id]
     }
 
     fun updateAssetSettings(id: Int, settings: Settings): Asset {
@@ -97,10 +95,6 @@ class AssetService {
         return assets[id]
     }
 
-    fun getResourceByResourceGroupNumber(id: Int?): List<Resource> {
-        return (assets.filter { it.resource.address.groupNumber == id }.map { it.resource })
-    }
-
     fun getAssetByResourceGroupNumberAndWireNumber(groupNumber: Int, wireNumber: Int): Asset {
         return assets.filter { it.resource.address.groupNumber == groupNumber && it.resource.address.number == wireNumber }
                 .first()
@@ -108,59 +102,11 @@ class AssetService {
 
     fun getPowerMeterById(id: Int): Meter {
         val wire = assets.filter { it.meter.number == id }.first()
-        return simulateMeter(wire)
+        return meteringService.simulateMeter(wire)
     }
 
     fun getPowerMeters(): List<Meter> {
-        return (assets.map { simulateMeter(it) })
-    }
-
-    fun simulateMeter(asset: Asset): Meter {
-        val meter = asset.meter
-
-        if (meter.error != null) {
-            meter.activePower = null;
-            return meter
-        }
-
-        var deviation = (0..asset.settings.maxDeviation).random()
-        val availableCapacity = asset.settings.maxPower - asset.settings.minPower
-        val targetLevelChange = asset.resource.targetLevel.value - asset.status.previousLevel
-
-        // default consumption when we are not ramping up or down
-        var expectedLevel = asset.resource.targetLevel.value
-
-        if(targetLevelChange > 0) {
-            // ramping up
-            // val ratePerSecondInWatts = (availableCapacity * asset.settings.rampRate) / (100F * 60)
-            val ratePerSecondInLevelSteps = (1000 * asset.settings.rampRate) / (100F * 60)
-            val secondsSinceLevelChange = asset.status.targetLevelChangedAt.until(OffsetDateTime.now(), ChronoUnit.SECONDS)
-            val rampingLevel = (secondsSinceLevelChange * ratePerSecondInLevelSteps + asset.status.previousLevel).toInt()
-            if (rampingLevel < asset.resource.targetLevel.value) {
-                expectedLevel = rampingLevel
-            }
-        }
-        if(targetLevelChange < 0) {
-            // ramping down
-            val ratePerSecondInLevelSteps = (1000 * asset.settings.rampRate) / (100F * 60)
-            val secondsSinceLevelChange = asset.status.targetLevelChangedAt.until(OffsetDateTime.now(), ChronoUnit.SECONDS)
-            val rampingLevel = (asset.status.previousLevel - secondsSinceLevelChange * ratePerSecondInLevelSteps).toInt()
-            if (rampingLevel > asset.resource.targetLevel.value) {
-                expectedLevel = rampingLevel
-            }
-        }
-
-        var consumption = (availableCapacity / 1000) * expectedLevel + asset.settings.minPower
-
-
-        if (consumption - deviation > 0) {
-            deviation *= intArrayOf(-1,1)[Random.nextInt(2)]
-        }
-        consumption += deviation
-        val onePhase = consumption / 3
-        val inPhases = mutableListOf<Int>(onePhase, onePhase, consumption - (onePhase * 2))
-        meter.activePower = ActivePower(OffsetDateTime.now(), consumption, inPhases, ActivePower.Unit.w)
-        return meter
+        return (assets.map { meteringService.simulateMeter(it) })
     }
 
 }

@@ -7,7 +7,7 @@ package eu.bitwalker.symasset.model
  */
 data class Error(
     /* Error code: * unavailable - The meter is unavailable, API implementation has lost connection to it; * unknown - The meter is in some unexpected error state (check the message for more information); Read-only.  */
-    var code: DeviceError.Code,
+    var code: Code,
 
     var message: String? = null
 )

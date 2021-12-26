@@ -1,6 +1,8 @@
 package eu.bitwalker.symasset
 
 import eu.bitwalker.symasset.service.AssetService
+import eu.bitwalker.symasset.service.MeteringService
+import eu.bitwalker.symasset.service.ResourceGroupService
 import eu.bitwalker.symasset.web.assetApi
 import eu.bitwalker.symasset.web.index
 import eu.bitwalker.symasset.web.mockControlApi
@@ -15,7 +17,10 @@ fun main(args: Array<String>): Unit = io.ktor.server.netty.EngineMain.main(args)
 
 fun Application.module() {
 
-    val assetService = AssetService()
+    val resourceGroupService = ResourceGroupService()
+    val meteringService = MeteringService()
+    val assetService = AssetService(resourceGroupService, meteringService)
+
     assetService.initializeAnalogWires(2)
     assetService.initializeRelayWires(2)
 
@@ -30,6 +35,6 @@ fun Application.module() {
         index(assetService)
         assetApi(assetService)
         mockMeteringApi(assetService)
-        mockControlApi(assetService)
+        mockControlApi(assetService, resourceGroupService, meteringService)
     }
 }
