@@ -7,7 +7,6 @@ import io.ktor.http.*
 import io.ktor.http.content.*
 import io.ktor.routing.*
 import kotlinx.html.*
-import java.io.File
 
 fun Route.index(assetService: AssetService) {
 

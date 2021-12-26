@@ -14,12 +14,12 @@ It implements the endpoints for the control and analog API server. By default it
 
 To run the application locally, execute: `./gradlew run`
 
-## Publishing to Heroku
+## Publishing to Heroku manually
 
 Create a Heroku app using the Heroku CLI:
 
-```$ heroku create sym-asset```
+```$ heroku create```
 
 Build your application, and run the deployHeroku task:
 
-```$ ./gradlew build deployHeroku```
+```$ ./gradlew stage deployHeroku```

@@ -1,6 +1,5 @@
 package eu.bitwalker.symasset
 
-import com.google.gson.*
 import eu.bitwalker.symasset.service.AssetService
 import eu.bitwalker.symasset.web.assetApi
 import eu.bitwalker.symasset.web.index

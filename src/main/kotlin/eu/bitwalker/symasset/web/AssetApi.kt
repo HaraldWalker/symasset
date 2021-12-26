@@ -7,7 +7,6 @@ import io.ktor.application.*
 import io.ktor.request.*
 import io.ktor.response.*
 import io.ktor.routing.*
-import net.sympower.metering.api.server.models.DeviceError
 
 fun Route.assetApi(assetService: AssetService) {
 

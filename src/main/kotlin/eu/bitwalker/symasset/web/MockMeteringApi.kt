@@ -11,7 +11,6 @@
  */
 package eu.bitwalker.symasset.web
 
-import com.google.gson.Gson
 import eu.bitwalker.symasset.service.AssetService
 import io.ktor.application.*
 import io.ktor.response.*
