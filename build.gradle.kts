@@ -8,6 +8,7 @@ plugins {
     id("org.openapi.generator") version "5.3.0"
     id("de.undercouch.download") version "4.1.2"
     id ("com.heroku.sdk.heroku-gradle") version "2.0.0"
+    id("com.google.cloud.tools.jib") version "3.1.4"
 }
 
 group = "eu.bitwalker"

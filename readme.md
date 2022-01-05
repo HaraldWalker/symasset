@@ -23,3 +23,25 @@ Create a Heroku app using the Heroku CLI:
 Build your application, and run the deployHeroku task:
 
 ```$ ./gradlew stage deployHeroku```
+
+## Building and running a Docker image
+
+To build an image to the local Docker registry run:
+
+```shell
+./gradlew jibDockerBuild
+```
+
+After that you can see `symasset:0.0.1` in your local image registry. The version of the image is taken from your project configuration.
+
+```shell
+docker run -p 8080:8080 symasset:0.0.1
+```
+
+### Build image to an external registry
+
+To build an image to an external registry run:
+```shell
+IMAGE_PATH=`MY IMAGE PAHT`
+./gradlew jib  --image=$IMAGE_PATH
+```
