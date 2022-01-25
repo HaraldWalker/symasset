@@ -1,6 +1,6 @@
-# SymAsset
+# SymAssets
 
-Simulation of an asset with anlog/relay wire resource and power meter for the Sympower control and metering API.
+Simulation of assets with anlog/relay wire resource and power meter for the Sympower control and metering API.
 
 It implements the endpoints for the control and analog API server. By default it starts with two analog and two relay wires, each with one power meter. Additional assets can be added via UI and API.
 

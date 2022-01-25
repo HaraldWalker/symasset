@@ -1,6 +1,6 @@
 openapi: 3.0.3
 info:
-  title: SYMASSET
+  title: SYMASSETS
   description: Simulation of assets with power meters for the Sympower control and metering API.
   version: 1.0.0
 

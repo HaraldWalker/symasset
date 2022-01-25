@@ -32,7 +32,7 @@ fun Route.index(assetService: AssetService) {
                 nav("navbar navbar-expand-lg navbar-dark bg-primary") {
                     div(classes = "container-fluid") {
                         a(href = "#", classes = "navbar-brand") {
-                            +"SymAsset"
+                            +"SymAssets"
                         }
                         div(classes = "navbar-nav ms-auto") {
                             form(
