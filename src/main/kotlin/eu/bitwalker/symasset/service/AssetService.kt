@@ -60,7 +60,7 @@ class AssetService(private val resourceGroupService: ResourceGroupService, priva
             ActivePower(now, 1000, null, ActivePower.Unit.w),
             null
         )
-        val wire = Asset(resource, meter, Settings(0, 10000000, 10000, 51), Status(0, now))
+        val wire = Asset(resource, meter, Settings(0, 1500000, 10000, 51), Status(0, now))
         assets.add(wire)
         resourceGroupService.addResource(wire.resource)
         return wire
