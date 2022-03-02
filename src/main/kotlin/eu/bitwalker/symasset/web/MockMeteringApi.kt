@@ -29,7 +29,6 @@ fun Route.mockMeteringApi(assetService: AssetService) {
     route("/metering/meters") {
         get {
             call.respond(assetService.getPowerMeters())
-
         }
     }
 
